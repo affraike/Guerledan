@@ -1,0 +1,4 @@
+<launch>
+    <include file="$(find test_kalman_command) test.launch"/>
+    <include file="$(find gpsd_client) gps.launch"/>
+</launch>
