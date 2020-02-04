@@ -1,0 +1,3 @@
+<launch>
+    <node name="cap" pkg="cap_boat" type="cap_talker" output="screen"/>
+</launch>

@@ -1,0 +1,5 @@
+<launch>
+    <include file="$(find cap_boat)/launch/cap.launch"/>
+    <include file="$(find gpsd_client)/launch/gps.launch"/>
+    <include file="$(find test_kalman_command)/launch/test.launch"/>
+</launch>

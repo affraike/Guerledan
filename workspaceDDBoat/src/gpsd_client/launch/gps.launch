@@ -1,0 +1,4 @@
+<launch>
+    <node name="client" pkg="gpsd_client" type="gpsd_client" output="screen" />
+    <node name="lambert" pkg="gpsd_client" type="lambert_node" output="screen" />
+</launch>

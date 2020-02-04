@@ -11,7 +11,7 @@ def callback_cmd(data):
     #rospy.loginfo(rospy.get_caller_id() + "I heard %f %f", data.u1, data.u2)
     
     u1, u2 = data.u1, data.u2
-    ardudrv.send_arduino_cmd_motor(serial_arduino, u1, u2)
+    # ardudrv.send_arduino_cmd_motor(serial_arduino, u1, u2)
     
 def listener():
     rospy.init_node('Driver_cmd_motors', anonymous=True)

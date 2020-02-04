@@ -1,0 +1,6 @@
+<launch>
+    <node name="cons" pkg="test_kalman_command" type="command" output="screen" />
+    <node name="control" pkg="test_kalman_command" type="control" output="screen" />
+    <node name="kalman" pkg="test_kalman_command" type="kalman" output="screen" />
+    <node name="motors" pkg="test_kalman_command" type="arduino_driver_py3_ROS.py" output="screen"/>
+</launch>
