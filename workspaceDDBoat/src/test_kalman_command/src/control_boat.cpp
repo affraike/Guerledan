@@ -16,7 +16,7 @@ using namespace Eigen;
 double x_boat, y_boat, heading_boat, vitesse_boat;
 Vector2d w, dw, ddw;
 Vector4d vecteur_etat;
-const double T = 0.1; // constante de convergence
+const double T = 1; // constante de convergence
 
 
 Vector2d command(Vector4d& x, Vector2d& w, Vector2d& dw, Vector2d& ddw, const double T){
