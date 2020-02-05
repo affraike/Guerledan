@@ -20,6 +20,7 @@ catkin_create_pkg test_kalman_command --rosdistro=kinetic
 catkin_create_pkg gpsd_client --rosdistro=kinetic
 catkin_create_pkg start --rosdistro=kinetic
 catkin_create_pkg cap_boat --rosdistro=kinetic
+catkin_create_pkg encoders_boat --rosdistro=kinetic
 
 unset http_proxy 
 unset https_proxy
