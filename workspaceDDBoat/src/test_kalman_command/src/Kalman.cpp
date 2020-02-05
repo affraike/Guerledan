@@ -52,7 +52,7 @@ void capCallback(const std_msgs::Float64::ConstPtr& msg){
 int main(int argc, char **argv){
     //Initialisation Kalman
     // ------------------------------------------
-    Vector4d x0 = {0., 0., 0., 0.1}; // doit être initialisé correctement dans le launch !
+    Vector4d x0 = {0., 40., 0., 0.1}; // doit être initialisé correctement dans le launch !
     Matrix4d Gx0 = 10 * MatrixXd::Identity(4, 4);
     Matrix4d Galpha = MatrixXd::Zero(4, 4);
     MatrixXd C(3, 4);
@@ -85,6 +85,8 @@ int main(int argc, char **argv){
         // MàJ de la position
         Matrix4d A;
         A << 1., 0., 0., dt * cos(x0[2]), 0., 1., 0., dt * sin(x0[2]), 0., 0., 1., 0., 0., 0., 0., 1. - dt * abs(x0[3]);
+        ukal(2) = dt * (ukal(2) - ukal(3));
+        ukal(3) = dt * (ukal(2) + ukal(3));
         kalman(x0, Gx0, ukal, Galpha, A, ykal, Gbeta, C);
 
         // Création et publication du message contenant la position estimée
