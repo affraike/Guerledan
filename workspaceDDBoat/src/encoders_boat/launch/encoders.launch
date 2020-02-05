@@ -1,0 +1,3 @@
+<launch>
+    <node name="encoders" pkg="encoders_boat" type="encoders_talker" output="screen" />
+</launch>

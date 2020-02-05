@@ -47,12 +47,16 @@ void GPSCallback(const gpsd_client::GnssPose::ConstPtr& msg){
 
 void capCallback(const std_msgs::Float64::ConstPtr& msg){
     ykal(2) = msg->data;
+    ykal(2) -= 90.;
+    if (ykal(2) < 0.){
+        ykal(2) += 360.;
+    }
 }
 
 int main(int argc, char **argv){
     //Initialisation Kalman
     // ------------------------------------------
-    Vector4d x0 = {0., 40., 0., 0.1}; // doit être initialisé correctement dans le launch !
+    Vector4d x0 = {40., 0., 0., 0.1}; // doit être initialisé correctement dans le launch !
     Matrix4d Gx0 = 10 * MatrixXd::Identity(4, 4);
     Matrix4d Galpha = MatrixXd::Zero(4, 4);
     MatrixXd C(3, 4);
@@ -60,7 +64,7 @@ int main(int argc, char **argv){
     Matrix2d B;
     B << 1., -1., 1., 1.;
     Matrix3d Gbeta;
-    Gbeta << 5., 0, 0, 0, 5., 0, 0, 0, 5. * M_PI / 180.;
+    Gbeta << 5., 0, 0, 0, 5., 0, 0, 0, 1. * M_PI / 180.;
     // ------------------------------------------
 
     const double dt = 0.1;

@@ -70,7 +70,7 @@ int main(int argc, char **argv){
 
     while (ros::ok()){
         ros::spinOnce();
-        waypoint(w, dw, ddw, t, 15, 15);
+        waypoint(w, dw, ddw, t, 0., 0.);
         t += dt;
         test_kalman_command::Message_consigne msg_c;
         msg_c.w0 = w(0);
