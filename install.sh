@@ -11,7 +11,7 @@ mkdir /home/ue32/workspace_DDBoat/src
 cd /home/ue32/workspace_DDBoat
 catkin_make
 
-echo "source /home/ue32/workspace_DDBoat/devel/setup.bash" >> ~/.bashrc
+echo "source /home/ue32/workspaceDDBoat/devel/setup.bash" >> ~/.bashrc
 
 echo "\n____Création du package test_kalman_command"
 echo "____Création du package gpsd_client"
