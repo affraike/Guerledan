@@ -12,6 +12,10 @@ using namespace std;
 double latitude, longitude, track;
 bool new_data = false;
 bool data_valid = false;
+//double east0 = 253575.276988;
+//double north0 = 6805716.83588;
+double east0 = 253495.324541;
+double north0 = 6805738.35646;
 
 void navFix_callback(const gpsd_client::GPSFix::ConstPtr& msg){
   latitude =  msg->latitude;
@@ -62,8 +66,8 @@ int main(int argc, char *argv[])
         double east = longitude*M_PI/180.0; // Longitude
         double north = latitude*M_PI/180.0; // Latitude
         pj_transform(pj_latlong, pj_lambert, 1, 1, &east, &north, nullptr);
-        msg_pose.east = east;
-        msg_pose.north = north;
+        msg_pose.east = east - east0;
+        msg_pose.north = north - north0;
         msg_pose.heading = track;
 
         pose_pub.publish(msg_pose);
