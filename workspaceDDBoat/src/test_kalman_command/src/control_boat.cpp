@@ -1,12 +1,12 @@
 #include <cmath>
 #include "ros/ros.h"
-#include "geometry_msgs/PoseStamped.h"
-#include "geometry_msgs/Vector3.h"
+#include "std_msgs/Float64.h"
 #include "tf/tf.h"
 #include <eigen3/Eigen/Dense>
 #include <unistd.h>
 #include "test_kalman_command/Message_consigne.h"
 #include "test_kalman_command/custom_cmd_motors.h"
+#include "gpsd_client/GnssPose.h"
 /*
   Warning : penser à inclure ce type de message dans le CMakeListe
 */
@@ -37,12 +37,21 @@ void consignCallback(const test_kalman_command::Message_consigne& msg){
     ddw << msg.ddw0, msg.ddw1;
 }
 
-void stateCallback(const geometry_msgs::PoseStamped::ConstPtr& msg){
+void stateCallback(const gpsd_client::GnssPose::ConstPtr& msg){
     /*
       Permet de récupérer le vecteur d'état après Kalman
     */
-    vecteur_etat <<  msg->pose.position.x, msg->pose.position.y, tf::getYaw(msg->pose.orientation), msg->pose.position.z;
+    vecteur_etat(0) = msg->east;
+    vecteur_etat(1) = msg->north;
+    vecteur_etat(3) = msg->speed;
     //on met dans z la vitesse estimée du bateau
+}
+void capCallback(const std_msgs::Float64::ConstPtr& msg){
+    vecteur_etat(2) = msg->data;
+    vecteur_etat(2) -= 90.;
+    if (vecteur_etat(2) < 0.){
+        vecteur_etat(2) += 360.;
+    }
 }
 
 int main(int argc, char **argv){
@@ -51,7 +60,8 @@ int main(int argc, char **argv){
     ros::NodeHandle n;
     ros::Publisher control = n.advertise<test_kalman_command::custom_cmd_motors>("u", 1000);
     ros::Subscriber sub = n.subscribe("command", 1000, consignCallback);
-    ros::Subscriber sub2 = n.subscribe("xhat", 1000, stateCallback);
+    ros::Subscriber sub2 = n.subscribe("poseRaw", 1000, stateCallback);
+    ros::Subscriber sub3 = n.subscribe("cap", 1000, capCallback);
     ros::Rate loop_rate(25.);
 
     while (ros::ok()){

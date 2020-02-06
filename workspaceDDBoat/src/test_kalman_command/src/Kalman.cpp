@@ -57,23 +57,23 @@ int main(int argc, char **argv){
     //Initialisation Kalman
     // ------------------------------------------
     Vector4d x0 = {40., 0., 0., 0.1}; // doit être initialisé correctement dans le launch !
-    Matrix4d Gx0 = 10 * MatrixXd::Identity(4, 4);
+    Matrix4d Gx0 = 100 * MatrixXd::Identity(4, 4);
     Matrix4d Galpha = MatrixXd::Zero(4, 4);
     MatrixXd C(3, 4);
     C << 1., 0., 0., 0., 0., 1., 0., 0., 0., 0., 1., 0.;
     Matrix2d B;
     B << 1., -1., 1., 1.;
     Matrix3d Gbeta;
-    Gbeta << 5., 0, 0, 0, 5., 0, 0, 0, 1. * M_PI / 180.;
+    Gbeta << 1., 0, 0, 0, 1., 0, 0, 0, 1. * M_PI / 180.;
     // ------------------------------------------
 
     const double dt = 0.1;
     ros::init(argc, argv, "Kalman");
     ros::NodeHandle n;
-    n.param<double>("pos_x", x0(0), 0.0);
+    n.param<double>("pos_x", x0(0), 40.0);
     n.param<double>("pos_y", x0(1), 0.0);
     n.param<double>("yaw", x0(2), 0.0);
-    n.param<double>("yaw", x0(3), 0.1);
+    n.param<double>("speed", x0(3), 0.1);
     ros::Publisher estimated_state = n.advertise<geometry_msgs::PoseStamped>("xhat", 1000);
     ros::Publisher vis_pub = n.advertise<visualization_msgs::Marker>( "/visualization_marker", 0 );
     ros::Subscriber u = n.subscribe("u", 1000, comCallback); // message de type Vector3

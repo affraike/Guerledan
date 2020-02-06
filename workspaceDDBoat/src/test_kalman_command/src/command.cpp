@@ -12,9 +12,9 @@ using namespace Eigen;
 void lissajous(Vector2d& w, Vector2d& dw, Vector2d& ddw, double t, const double p, const double q, const double a, double b){
     // p = 1, q = 2, donne la courbe attendue. Multiplier p et q par un même facteur permet de gérer la vitesse de
     // parcours de la courbe.
-    w << a * sin(p * t), b * sin(q * t);
-    dw << a * p * cos(p * t), b * q * cos(q * t);
-    ddw << -a * pow(p, 2) * sin(p * t), -b * pow(q, 2) * sin(q * t);
+    w << -20 + b * sin(q * t), a * sin(p * t);
+    dw << b * q * cos(q * t), a * p * cos(p * t);
+    ddw << -b * pow(q, 2) * sin(q * t), -a * pow(p, 2) * sin(p * t);
 }
 
 void waypoint(Vector2d& w, Vector2d& dw, Vector2d& ddw, double t, double x, double y){

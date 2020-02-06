@@ -60,8 +60,8 @@ def callback_cmd(data):
 
     Ecmdl, Ecmdr = calcul_encoders()
     
-    cmdl = u1-Ecmdl
-    cmdr = u2-Ecmdr
+    cmdl = 25.5 *(u1-Ecmdl)
+    cmdr = 25.5 * (u2-Ecmdr)
     
     if(cmdl > 255):
         cmdl = 255
