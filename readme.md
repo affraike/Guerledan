@@ -35,16 +35,20 @@ ____________________
 #Default settings for the gpsd init script and the hotplug wrapper.
 
 #Start the gpsd daemon automatically at boot time
+
 START_DAEMON="true"
 
 #Use USB hotplugging to add new USB devices automatically to the daemon
+
 USBAUTO="false"
 
 #Devices gpsd should collect to at boot time.
 #They need to be read/writeable, either by user gpsd or the group dialout.
-DEVICES="/dev/ttys0"
+
+DEVICES="/dev/ttyS0"
 
 #Other options you want to pass to gpsd
+
 GPSD_OPTIONS=""
 _________________________
 
@@ -127,4 +131,15 @@ chmod +x *.py
 cd src
 chmod +x *.py
 ```
+* Freeze pendant l'installation lors du catkin_make
+
+Fix :
+
+Quitter et relancer manuellement le catkin_make
+
+```
+cd /home/ue32/workspaceDDBoat/
+catkin_make
+```
+
 
