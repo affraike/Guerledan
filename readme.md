@@ -1,4 +1,4 @@
-#Salut, c'est le readme
+# Salut, c'est le readme
 
 Consigne d'installation:
 
@@ -9,6 +9,8 @@ ssh pi@172.20.25.2XX
 password : pi
 ```
 ### installation des bibliothèques pour le GPS:
+
+A lancer depuis le DDBoat :
 ```
 unset http_proxy
 unset https_proxy
@@ -46,22 +48,23 @@ DEVICES="/dev/ttys0"
 GPSD_OPTIONS=""
 _________________________
 
-## Pour lancer l'installation, il faut telecharger le install.sh
+## Pour lancer l'installation :
 
-ensuite, tappez pour envoyer le fichier sur le DDBoat :
+il faut telecharger le install.sh
+ensuite, envoyez le fichier sur le DDBoat
+* depuis l'ordinateur :
 ```
 scp -r ./install.sh ue32@172.20.25.2XX:~/ 
 ```
-
-ensuite, connectez vous à celui-ci :
+ensuite, connectez vous au DDBoat :
 ```
 ssh ue32@172.20.25.2XX
 ```
 Password : ue32
 
-sur le DDBoat:
+* depuis le DDBoat:
 
-Donnez les droits d'éxecution au fichier
+Donnez les droits d'éxecution au fichier et le lancer :
 ```
 chmod +x install.sh
 
@@ -73,12 +76,13 @@ chmod +x install.sh
 cf Robin et Agathe:
 
 Copier obligatoirement le dossier Driver_IMU dans ~/cpp sur le DDBoat
-Sur le bateau : 
+
+* Sur le bateau : 
 ```
 mkdir cpp
 ```
 
-Sur le PC : 
+* Sur le PC : 
 ```
 scp -r Driver_IMU ue32@172.20.25.2XX:~/cpp
 scp cal.sh ue32@172.20.25.2XX:~/cpp
@@ -86,11 +90,13 @@ scp -r ROS ue32@172.20.25.2XX:~/cpp  (optionnel)
 ```
 
 Pour calibrer : 
+
 ```
 cd cpp
 chmod +x cal.sh
 ./cal.sh
 ```
+
 Faire des rotations lentes du bateau sur les trois axes et dans les deux sens jusqu'à ce que les valeurs pour l'axe n'evoluent plus.
 
 Presser ENTREE
@@ -103,5 +109,22 @@ rostopic echo cap
 
 <h1>et Voilà</h1>
 
+## Troubleshooting
 
+* Probleme lors du launch :
+
+```
+ERROR: cannot launch node of type [test_kalman_command/arduino_driver_py3_Ros]: can't locate node 
+```
+
+Fix :
+
+Donner les droits d'éxecution aux fichiers .py
+
+```
+cd /home/ue32/workspaceDDBoat/src/test_kalman_command/
+chmod +x *.py
+cd src
+chmod +x *.py
+```
 
