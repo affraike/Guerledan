@@ -15,6 +15,8 @@ using namespace Eigen;
 
 Vector3d ykal;
 Vector4d ukal;
+bool initialization_gps = true, initialization_cap = true;
+Vector4d x0 = {40., 0., 0., 0.1}; // doit être initialisé correctement dans le launch !
 
 void kalman_predict(Vector4d& x1, Matrix4d& Gx1, Vector4d& xup, Matrix4d& Gup, Vector4d& u, Matrix4d& Galpha, Matrix4d& A){
     Gx1 = A * Gup * A.transpose() + Galpha;
@@ -43,6 +45,12 @@ void comCallback(const test_kalman_command::custom_cmd_motors::ConstPtr& msg){
 void GPSCallback(const gpsd_client::GnssPose::ConstPtr& msg){
     ykal(0) = msg->east;
     ykal(1) = msg->north;
+
+    if (initialization_gps){
+        x0(0) = msg->east;
+        x0(1) = msg->north;
+        initialization_gps = false;
+    }
 }
 
 void capCallback(const std_msgs::Float64::ConstPtr& msg){
@@ -51,13 +59,17 @@ void capCallback(const std_msgs::Float64::ConstPtr& msg){
     if (ykal(2) < 0.){
         ykal(2) += 360.;
     }
+
+    if (initialization_cap){
+        x0(2) = ykal(2);
+        initialization_cap = false;
+    }
 }
 
 int main(int argc, char **argv){
     //Initialisation Kalman
     // ------------------------------------------
-    Vector4d x0 = {40., 0., 0., 0.1}; // doit être initialisé correctement dans le launch !
-    Matrix4d Gx0 = 100 * MatrixXd::Identity(4, 4);
+    Matrix4d Gx0 = 10 * MatrixXd::Identity(4, 4);
     Matrix4d Galpha = MatrixXd::Zero(4, 4);
     MatrixXd C(3, 4);
     C << 1., 0., 0., 0., 0., 1., 0., 0., 0., 0., 1., 0.;
@@ -70,10 +82,7 @@ int main(int argc, char **argv){
     const double dt = 0.1;
     ros::init(argc, argv, "Kalman");
     ros::NodeHandle n;
-    n.param<double>("pos_x", x0(0), 40.0);
-    n.param<double>("pos_y", x0(1), 0.0);
-    n.param<double>("yaw", x0(2), 0.0);
-    n.param<double>("speed", x0(3), 0.1);
+
     ros::Publisher estimated_state = n.advertise<geometry_msgs::PoseStamped>("xhat", 1000);
     ros::Publisher vis_pub = n.advertise<visualization_msgs::Marker>( "/visualization_marker", 0 );
     ros::Subscriber u = n.subscribe("u", 1000, comCallback); // message de type Vector3
@@ -86,46 +95,49 @@ int main(int argc, char **argv){
         // Acquisition de la commande et du GPS
         ros::spinOnce();
 
-        // MàJ de la position
-        Matrix4d A;
-        A << 1., 0., 0., dt * cos(x0[2]), 0., 1., 0., dt * sin(x0[2]), 0., 0., 1., 0., 0., 0., 0., 1. - dt * abs(x0[3]);
-        ukal(2) = dt * (ukal(2) - ukal(3));
-        ukal(3) = dt * (ukal(2) + ukal(3));
-        kalman(x0, Gx0, ukal, Galpha, A, ykal, Gbeta, C);
+        if (not initialization_gps and not initialization_cap) {
+            // MàJ de la position
+            Matrix4d A;
+            A << 1., 0., 0., dt * cos(x0[2]), 0., 1., 0., dt * sin(x0[2]), 0., 0., 1., 0., 0., 0., 0., 1. -
+                                                                                                       dt * abs(x0[3]);
+            ukal(2) = dt * (ukal(2) - ukal(3));
+            ukal(3) = dt * (ukal(2) + ukal(3));
+            kalman(x0, Gx0, ukal, Galpha, A, ykal, Gbeta, C);
 
-        // Création et publication du message contenant la position estimée
-        // ------------------------------------------------------------------------
-        geometry_msgs::PoseStamped msg;
-        msg.pose.position.x = x0(0);
-        msg.pose.position.y = x0(1);
-        msg.pose.position.z = x0(3); // attention : z correspond ici à la vitesse !
-        q.setRPY(0, 0, x0(2));
-        tf::quaternionTFToMsg(q, msg.pose.orientation);
-        msg.header.stamp = ros::Time::now();
-        msg.header.frame_id = "map";
-        estimated_state.publish(msg);
-        // ------------------------------------------------------------------------
-        // Création du marker : à modifier pour les dimensions du robot
-        // -----------------------------------------------------
-        visualization_msgs::Marker marker;
-        marker.header.frame_id = "map";
-        marker.header.stamp = ros::Time();
-        marker.ns = ros::this_node::getNamespace();
-        marker.id = 0;
-        marker.type = visualization_msgs::Marker::MESH_RESOURCE;
-        marker.action = visualization_msgs::Marker::ADD;
-        marker.pose = msg.pose;
-        tf::quaternionTFToMsg(q, marker.pose.orientation);
-        marker.scale.x = 1;
-        marker.scale.y = 1;
-        marker.scale.z = 1;
-        marker.color.a = 1.0;
-        marker.color.r = 1.0;
-        marker.color.g = 1.0;
-        marker.color.b = 1.0;
-        marker.mesh_resource = "package://tp2/meshs/boat.dae";
-        vis_pub.publish( marker );
-        // -----------------------------------------------------
+            // Création et publication du message contenant la position estimée
+            // ------------------------------------------------------------------------
+            geometry_msgs::PoseStamped msg;
+            msg.pose.position.x = x0(0);
+            msg.pose.position.y = x0(1);
+            msg.pose.position.z = x0(3); // attention : z correspond ici à la vitesse !
+            q.setRPY(0, 0, x0(2));
+            tf::quaternionTFToMsg(q, msg.pose.orientation);
+            msg.header.stamp = ros::Time::now();
+            msg.header.frame_id = "map";
+            estimated_state.publish(msg);
+            // ------------------------------------------------------------------------
+            // Création du marker : à modifier pour les dimensions du robot
+            // -----------------------------------------------------
+            visualization_msgs::Marker marker;
+            marker.header.frame_id = "map";
+            marker.header.stamp = ros::Time();
+            marker.ns = ros::this_node::getNamespace();
+            marker.id = 0;
+            marker.type = visualization_msgs::Marker::MESH_RESOURCE;
+            marker.action = visualization_msgs::Marker::ADD;
+            marker.pose = msg.pose;
+            tf::quaternionTFToMsg(q, marker.pose.orientation);
+            marker.scale.x = 1;
+            marker.scale.y = 1;
+            marker.scale.z = 1;
+            marker.color.a = 1.0;
+            marker.color.r = 1.0;
+            marker.color.g = 1.0;
+            marker.color.b = 1.0;
+            marker.mesh_resource = "package://tp2/meshs/boat.dae";
+            vis_pub.publish(marker);
+            // -----------------------------------------------------
+        }
         loop_rate.sleep();
     }
     return 0;

@@ -64,7 +64,7 @@ int main(int argc, char **argv){
     ros::Publisher cons = n.advertise<test_kalman_command::Message_consigne>("command", 1000);
     ros::Rate loop_rate(10.);
     double t = 0, dt = 0.1;
-    const double p = 0.1,q = 0.2,a = 40,b = 20, T = 10;
+    const double p = 0.1,q = 0.2,a = 40,b = 20;
     Vector2d w, dw, ddw;
 
 

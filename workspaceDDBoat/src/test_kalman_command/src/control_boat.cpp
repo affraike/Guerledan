@@ -13,7 +13,6 @@
 using namespace std;
 using namespace Eigen;
 
-double x_boat, y_boat, heading_boat, vitesse_boat;
 Vector2d w, dw, ddw;
 Vector4d vecteur_etat;
 const double T = 1; // constante de convergence
@@ -28,6 +27,28 @@ Vector2d command(Vector4d& x, Vector2d& w, Vector2d& dw, Vector2d& ddw, const do
     Vector2d dy = {x[3] * cos(x[2]), x[3] * sin(x[2])};
     Vector2d v = pow(1.0/T, 2) * (w - y) + (2.0/T) * (dw - dy) + ddw;
     Vector2d u = A.inverse() * (v - b);
+    return u;
+}
+
+Vector2d regul(Vector4d& x , Vector2d& w){
+    Vector2d u;
+    double heading_boat = x(2) * M_PI / 180.0;
+    double heading_waypoint = atan2(w(1) - x(1), w(0) - x(0));
+    double err = 2 * atan(tan((heading_waypoint - heading_boat)/2));
+    double K = 50;
+    double d = sqrt(pow(w(0) - x(0), 2) + pow(w(1) - x(1), 2));
+    if (d > 1){
+        if (abs(err) <= M_PI /2.0){
+            u = {125 + K * err, 125 - K * err};
+        }else if (err < -M_PI /2.0){
+            u = {0.1, 150.};
+        }else{
+            u = {150., 0.1};
+        }
+    }else{
+        u = {0.1, 0.1};
+    }
+
     return u;
 }
 
@@ -62,7 +83,7 @@ int main(int argc, char **argv){
     ros::Subscriber sub = n.subscribe("command", 1000, consignCallback);
     ros::Subscriber sub2 = n.subscribe("poseRaw", 1000, stateCallback);
     ros::Subscriber sub3 = n.subscribe("cap", 1000, capCallback);
-    ros::Rate loop_rate(25.);
+    ros::Rate loop_rate(5.);
 
     while (ros::ok()){
         ros::spinOnce();
@@ -71,10 +92,11 @@ int main(int argc, char **argv){
         */
         Vector2d u;
         double u1, u2;
-        
-        u = command(vecteur_etat, w, dw, ddw, T);
-        u1 = min(255., max(0., u[0]));
-        u2 = min(255., max(0., u[1]));
+
+        //u = command(vecteur_etat, w, dw, ddw, T);
+        u = regul(vecteur_etat, w);
+        u1 = u(0);
+        u2 = u(1);
         /*
           Publication des commandes moteurs
         */
