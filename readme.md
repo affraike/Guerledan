@@ -142,4 +142,19 @@ cd /home/ue32/workspaceDDBoat/
 catkin_make
 ```
 
+* Pas de GPS
+
+Fix :
+
+Bien vérifier que toutes les installations et le fichier ont été bien réalisées/modifiées.
+Vérifier que le bateau a une vue sur le ciel.
+
+Sinon, se connecter en mode pi :
+
+```
+sudo reboot -f
+```
+Et attendre le redémarrage du DDBoat, parfois ça aide
+
+
 
