@@ -16,7 +16,7 @@ using namespace Eigen;
 Vector2d w, dw, ddw;
 Vector4d vecteur_etat;
 const double T = 1; // constante de convergence
-
+double err = 0;
 
 Vector2d command(Vector4d& x, Vector2d& w, Vector2d& dw, Vector2d& ddw, const double T){
     Matrix2d A;
@@ -34,17 +34,15 @@ Vector2d regul(Vector4d& x , Vector2d& w){
     Vector2d u;
     double heading_boat = x(2) * M_PI / 180.0;
     double heading_waypoint = atan2(w(1) - x(1), w(0) - x(0));
-    double err = 2 * atan(tan((heading_waypoint - heading_boat)/2));
-    double K = 50;
+    err = 2 * atan(tan((heading_boat - heading_waypoint)/2));
+    ROS_INFO("boat :%f, waypoint:%f, err:%f", heading_boat, heading_waypoint, err);
+    double Kp = 5, Kd = 1;
     double d = sqrt(pow(w(0) - x(0), 2) + pow(w(1) - x(1), 2));
-    if (d > 1){
+    if (d > 2.){
         if (abs(err) <= M_PI /2.0){
-            u = {125 + K * err, 125 - K * err};
-        }else if (err < -M_PI /2.0){
-            u = {0.1, 150.};
-        }else{
-            u = {150., 0.1};
-        }
+            u = {80. - Kp * err, 80. + Kp * err};
+        }else (err < -M_PI /2.0){
+            u = {50., 45.};
     }else{
         u = {0.1, 0.1};
     }

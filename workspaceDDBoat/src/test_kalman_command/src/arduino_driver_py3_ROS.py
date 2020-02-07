@@ -31,7 +31,7 @@ def calcul_encoders():
         errL = dOdoR*u1/u2-dOdoL
         errR = 0
         
-        kp = 0.1
+        kp = 0.
 
         Ecmdl = kp*errL
         Ecmdr = 0
@@ -43,7 +43,7 @@ def calcul_encoders():
         errL = 0
         errR = dOdoL*u2/u1-dOdoR
         
-        kp = 0.1
+        kp = 0.
 
         Ecmdl = 0
         Ecmdr = kp*errR
@@ -74,6 +74,8 @@ def callback_cmd(data):
     	cmdr = 0
     
     # ardudrv.send_arduino_cmd_motor(serial_arduino, cmdl, cmdr)
+    # time.sleep(0.1)
+    # ardudrv.send_arduino_cmd_motor(serial_arduino, 0, 0)
 
 def callback_encoders(data):
     t = data.time
