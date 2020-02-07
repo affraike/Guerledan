@@ -36,13 +36,14 @@ Vector2d regul(Vector4d& x , Vector2d& w){
     double heading_waypoint = atan2(w(1) - x(1), w(0) - x(0));
     err = 2 * atan(tan((heading_boat - heading_waypoint)/2));
     ROS_INFO("boat :%f, waypoint:%f, err:%f", heading_boat, heading_waypoint, err);
-    double Kp = 5, Kd = 1;
+    double Kp = 8, Kd = 1;
     double d = sqrt(pow(w(0) - x(0), 2) + pow(w(1) - x(1), 2));
     if (d > 2.){
         if (abs(err) <= M_PI /2.0){
-            u = {80. - Kp * err, 80. + Kp * err};
-        }else (err < -M_PI /2.0){
+            u = {130. - Kp * err, 130. + Kp * err};
+        }else{
             u = {50., 45.};
+        }
     }else{
         u = {0.1, 0.1};
     }

@@ -73,7 +73,7 @@ def callback_cmd(data):
     elif(cmdr < 0):
     	cmdr = 0
     
-    # ardudrv.send_arduino_cmd_motor(serial_arduino, cmdl, cmdr)
+    ardudrv.send_arduino_cmd_motor(serial_arduino, cmdl, cmdr)
     # time.sleep(0.1)
     # ardudrv.send_arduino_cmd_motor(serial_arduino, 0, 0)
 
